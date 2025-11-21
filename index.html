@@ -287,116 +287,115 @@
   </div>
 
   <script>
-    const passageText =
-      "On Thanksgiving morning, my family wakes up early and the house already smells like cinnamon and warm bread. " +
-      "While the turkey cooks in the oven, we mash the potatoes, stir the gravy, and set the table with our best plates. " +
-      "Grandma tells funny stories from when she was a little girl, and we all laugh until our sides hurt. " +
-      "Before we start eating, we go around the table and share one thing we are thankful for this year. " +
-      "I say, \\"I am thankful for my family, my friends, and the cozy home we share.\\" " +
-      "After dinner, some of us play board games, some of us watch a parade on TV, and a few of us sneak one more slice of pumpkin pie. " +
-      "Thanksgiving reminds me to slow down, enjoy good food, and be grateful for the people I love.";
+  const passageText = 
+    "On Thanksgiving morning, my family wakes up early and the house already smells like cinnamon and warm bread. " +
+    "While the turkey cooks in the oven, we mash the potatoes, stir the gravy, and set the table with our best plates. " +
+    "Grandma tells funny stories from when she was a little girl, and we all laugh until our sides hurt. " +
+    "Before we start eating, we go around the table and share one thing we are thankful for this year. " +
+    "I am thankful for my family, my friends, and our cozy home. " +
+    "After dinner, some of us play board games, some of us watch a parade on TV, and a few of us sneak one more slice of pumpkin pie. " +
+    "Thanksgiving reminds me to slow down, enjoy good food, and be grateful for the people I love.";
 
-    const passageDisplay = document.getElementById("passageDisplay");
-    const typingArea = document.getElementById("typingArea");
-    const startBtn = document.getElementById("startBtn");
-    const finishBtn = document.getElementById("finishBtn");
-    const resultsBox = document.getElementById("results");
-    const statusMsg = document.getElementById("statusMsg");
+  const passageDisplay = document.getElementById("passageDisplay");
+  const typingArea = document.getElementById("typingArea");
+  const startBtn = document.getElementById("startBtn");
+  const finishBtn = document.getElementById("finishBtn");
+  const resultsBox = document.getElementById("results");
+  const statusMsg = document.getElementById("statusMsg");
 
-    passageDisplay.innerText = passageText;
+  passageDisplay.textContent = passageText;
 
-    let startTime = null;
-    let running = false;
+  let startTime = null;
+  let running = false;
 
-    function resetTest() {
-      typingArea.value = "";
-      typingArea.disabled = true;
-      startTime = null;
-      running = false;
-      startBtn.disabled = false;
-      finishBtn.disabled = true;
-      resultsBox.innerHTML = "";
-      statusMsg.innerHTML =
-        "Click <strong>Start Test</strong> to begin.";
-    }
+  function resetTest() {
+    typingArea.value = "";
+    typingArea.disabled = true;
+    startTime = null;
+    running = false;
+    startBtn.disabled = false;
+    finishBtn.disabled = true;
+    resultsBox.innerHTML = "";
+    statusMsg.innerHTML =
+      "Click <strong>Start Test</strong> to begin.";
+  }
 
-    function startTest() {
-      resetTest();
-      typingArea.disabled = false;
-      typingArea.focus();
-      startTime = performance.now();
-      running = true;
-      startBtn.disabled = true;
-      finishBtn.disabled = false;
-      statusMsg.textContent = "Typing in progress... Do your best!";
-    }
-
-    function finishTest() {
-      if (!running || startTime === null) return;
-
-      const endTime = performance.now();
-      running = false;
-      typingArea.disabled = true;
-      finishBtn.disabled = true;
-      startBtn.disabled = false;
-
-      const totalMs = endTime - startTime;
-      const totalSeconds = totalMs / 1000;
-      const minutes = totalSeconds / 60;
-
-      const typed = typingArea.value;
-      const ref = passageText;
-
-      // Character-level accuracy
-      const maxLen = Math.max(typed.length, ref.length);
-      let correctChars = 0;
-      for (let i = 0; i < maxLen; i++) {
-        if (typed[i] === ref[i]) {
-          correctChars++;
-        }
-      }
-      const accuracy = maxLen === 0 ? 0 : (correctChars / maxLen) * 100;
-
-      // Character count
-      const characterCount = typed.length;
-
-      // Word count (removes extra spaces)
-      const wordCount =
-        typed.trim().length === 0
-          ? 0
-          : typed.trim().split(/\s+/).length;
-
-      // Characters per minute
-      const cpm = minutes > 0 ? characterCount / minutes : 0;
-
-      let badgeClass = "needs";
-      let badgeText = "Keep Practicing";
-      if (accuracy >= 95) {
-        badgeClass = "good";
-        badgeText = "Amazing Accuracy!";
-      } else if (accuracy >= 85) {
-        badgeClass = "ok";
-        badgeText = "Nice Work!";
-      }
-
-      resultsBox.innerHTML = `
-        <div><strong>Time:</strong> ${totalSeconds.toFixed(1)} seconds</div>
-        <div><strong>Accuracy:</strong> ${accuracy.toFixed(1)}% 
-          <span class="badge ${badgeClass}">${badgeText}</span>
-        </div>
-        <div><strong>Words Typed:</strong> ${wordCount}</div>
-        <div><strong>Characters Typed:</strong> ${characterCount}</div>
-        <div><strong>Characters Per Minute:</strong> ${cpm.toFixed(0)}</div>
-      `;
-
-      statusMsg.textContent = "Great job! You can start again if you want.";
-    }
-
-    startBtn.addEventListener("click", startTest);
-    finishBtn.addEventListener("click", finishTest);
-
-    // Initialize
+  function startTest() {
     resetTest();
-  </script>
+    typingArea.disabled = false;
+    typingArea.focus();
+    startTime = performance.now();
+    running = true;
+    startBtn.disabled = true;
+    finishBtn.disabled = false;
+    statusMsg.textContent = "Typing in progress... Do your best!";
+  }
+
+  function finishTest() {
+    if (!running || startTime === null) return;
+
+    const endTime = performance.now();
+    running = false;
+    typingArea.disabled = true;
+    finishBtn.disabled = true;
+    startBtn.disabled = false;
+
+    const totalMs = endTime - startTime;
+    const totalSeconds = totalMs / 1000;
+    const minutes = totalSeconds / 60;
+
+    const typed = typingArea.value;
+    const ref = passageText;
+
+    // Character-level accuracy
+    const maxLen = Math.max(typed.length, ref.length);
+    let correctChars = 0;
+    for (let i = 0; i < maxLen; i++) {
+      if (typed[i] === ref[i]) {
+        correctChars++;
+      }
+    }
+    const accuracy = maxLen === 0 ? 0 : (correctChars / maxLen) * 100;
+
+    // Character + word counts
+    const characterCount = typed.length;
+    const wordCount =
+      typed.trim().length === 0
+        ? 0
+        : typed.trim().split(/\s+/).length;
+
+    // Characters per minute
+    const cpm = minutes > 0 ? characterCount / minutes : 0;
+
+    let badgeClass = "needs";
+    let badgeText = "Keep Practicing";
+    if (accuracy >= 95) {
+      badgeClass = "good";
+      badgeText = "Amazing Accuracy!";
+    } else if (accuracy >= 85) {
+      badgeClass = "ok";
+      badgeText = "Nice Work!";
+    }
+
+    resultsBox.innerHTML = `
+      <div><strong>Time:</strong> ${totalSeconds.toFixed(1)} seconds</div>
+      <div><strong>Accuracy:</strong> ${accuracy.toFixed(1)}% 
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div><strong>Words Typed:</strong> ${wordCount}</div>
+      <div><strong>Characters Typed:</strong> ${characterCount}</div>
+      <div><strong>Characters Per Minute:</strong> ${cpm.toFixed(0)}</div>
+    `;
+
+    statusMsg.textContent = "Great job! You can start again if you want.";
+  }
+
+  startBtn.addEventListener("click", startTest);
+  finishBtn.addEventListener("click", finishTest);
+
+  // Initialize
+  resetTest();
+</script>
+
 </body>
 </html>
