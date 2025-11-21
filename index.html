@@ -1,399 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Thanksgiving Typing Test – 3rd Grade</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #fef3c7;      /* warm tan */
-      --card: #fffbeb;    /* light cream */
-      --ink: #431407;     /* deep brown */
-      --accent: #c2410c;  /* burnt orange */
-      --accent-2: #92400e;/* darker orange */
-      --border: #fed7aa;
-      --muted: #78350f;
-      --good: #15803d;
-      --bad: #b91c1c;
-    }
+<script>
+  const passageText =
+    "On Thanksgiving morning, my family wakes up early and the house already smells like cinnamon and warm bread. " +
+    "While the turkey cooks in the oven, we mash the potatoes, stir the gravy, and set the table with our best plates. " +
+    "Grandma tells funny stories from when she was a little girl, and we all laugh until our sides hurt. " +
+    "Before we start eating, we go around the table and share one thing we are thankful for this year. " +
+    "I say, \"I am thankful for my family, my friends, and the cozy home we share.\" " +
+    "After dinner, some of us play board games, some of us watch a parade on TV, and a few of us sneak one more slice of pumpkin pie. " +
+    "Thanksgiving reminds me to slow down, enjoy good food, and be grateful for the people I love.";
 
-    * {
-      box-sizing: border-box;
-    }
+  const passageDisplay = document.getElementById("passageDisplay");
+  const typingArea = document.getElementById("typingArea");
+  const startBtn = document.getElementById("startBtn");
+  const finishBtn = document.getElementById("finishBtn");
+  const resultsBox = document.getElementById("results");
+  const statusMsg = document.getElementById("statusMsg");
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: radial-gradient(circle at top, #fffbeb, var(--bg));
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
+  passageDisplay.innerText = passageText;
 
-    .shell {
-      width: 100%;
-      max-width: 900px;
-      background: var(--card);
-      border-radius: 20px;
-      box-shadow: 0 18px 40px rgba(120, 53, 15, 0.25);
-      border: 2px solid var(--border);
-      padding: 20px;
-    }
+  let startTime = null;
+  let running = false;
 
-    .header {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+  function resetTest() {
+    typingArea.value = "";
+    typingArea.disabled = true;
+    startTime = null;
+    running = false;
+    startBtn.disabled = false;
+    finishBtn.disabled = true;
+    resultsBox.innerHTML = "";
+    statusMsg.innerHTML =
+      "Click <strong>Start Test</strong> to begin.";
+  }
 
-    .tag {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      background: rgba(194, 65, 12, 0.1);
-      color: var(--accent-2);
-      margin-bottom: 6px;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      margin: 4px 0;
-    }
-
-    .subtitle {
-      margin: 0;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .layout {
-      display: grid;
-      gap: 16px;
-    }
-
-    @media (min-width: 720px) {
-      .layout {
-        grid-template-columns: 1.1fr 1.1fr;
-      }
-    }
-
-    .card {
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 14px 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .card h2 {
-      font-size: 1rem;
-      margin: 0;
-      color: var(--accent-2);
-    }
-
-    .card small {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-
-    .passage-box {
-      max-height: 260px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .passage-box p {
-      margin: 0;
-      line-height: 1.5;
-      text-align: left;
-      font-size: 0.95rem;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 200px;
-      resize: vertical;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      font-size: 0.95rem;
-      font-family: inherit;
-      line-height: 1.4;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(194, 65, 12, 0.25);
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-top: 8px;
-    }
-
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.1s, box-shadow 0.1s, background-color 0.15s,
-        opacity 0.15s;
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #fff;
-      box-shadow: 0 8px 16px rgba(148, 27, 10, 0.35);
-    }
-
-    button.secondary {
-      background: #fef3c7;
-      color: var(--accent-2);
-      border: 1px solid var(--border);
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-
-    button:not(:disabled):active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: 0 4px 8px rgba(148, 27, 10, 0.25);
-    }
-
-    .pill-info {
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #fffbeb;
-      border: 1px dashed var(--border);
-      color: var(--muted);
-    }
-
-    .results {
-      margin-top: 8px;
-      font-size: 0.9rem;
-      display: grid;
-      gap: 4px;
-    }
-
-    .results strong {
-      color: var(--accent-2);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .badge.good {
-      background: rgba(22, 163, 74, 0.08);
-      color: var(--good);
-    }
-
-    .badge.ok {
-      background: rgba(252, 211, 77, 0.1);
-      color: #92400e;
-    }
-
-    .badge.needs {
-      background: rgba(185, 28, 28, 0.08);
-      color: var(--bad);
-    }
-
-    .footer-note {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <div class="header">
-      <div class="tag">🦃 Thanksgiving Typing • 3rd Grade</div>
-      <h1>Thankful Typing Challenge</h1>
-      <p class="subtitle">
-        Read the Thanksgiving paragraph, then type it as carefully as you can.
-        Try for your best accuracy!
-      </p>
-    </div>
-
-    <div class="layout">
-      <!-- Left: Passage -->
-      <section class="card">
-        <h2>1. Read This Passage</h2>
-        <small>Students should read it once before they begin typing.</small>
-        <div class="passage-box">
-          <p id="passageDisplay"></p>
-        </div>
-      </section>
-
-      <!-- Right: Typing Area -->
-      <section class="card">
-        <h2>2. Type the Passage</h2>
-        <small>Match spelling, punctuation, and capitalization.</small>
-        <textarea
-          id="typingArea"
-          placeholder="Click Start, then begin typing here..."
-          disabled
-        ></textarea>
-
-        <div class="controls">
-          <button id="startBtn" class="primary">
-            ▶ Start Test
-          </button>
-          <button id="finishBtn" class="secondary" disabled>
-            ✅ I'm Finished
-          </button>
-          <span class="pill-info" id="statusMsg">
-            Click <strong>Start Test</strong> to begin.
-          </span>
-        </div>
-
-        <div class="results" id="results"></div>
-      </section>
-    </div>
-
-    <div class="footer-note">
-      Teacher tip: Have students read their typed work out loud to check for
-      missing words and punctuation.
-    </div>
-  </div>
-
-  <script>
-    const passageText =
-      "On Thanksgiving morning, my family wakes up early and the house already smells like cinnamon and warm bread. " +
-      "While the turkey cooks in the oven, we mash the potatoes, stir the gravy, and set the table with our best plates. " +
-      "Grandma tells funny stories from when she was a little girl, and we all laugh until our sides hurt. " +
-      "Before we start eating, we go around the table and share one thing we are thankful for this year. " +
-      "I say, \"I am thankful for my family, my friends, and the cozy home we share.\" " +
-      "After dinner, some of us play board games, some of us watch a parade on TV, and a few of us sneak one more slice of pumpkin pie. " +
-      "Thanksgiving reminds me to slow down, enjoy good food, and be grateful for the people I love.";
-
-    const passageDisplay = document.getElementById("passageDisplay");
-    const typingArea = document.getElementById("typingArea");
-    const startBtn = document.getElementById("startBtn");
-    const finishBtn = document.getElementById("finishBtn");
-    const resultsBox = document.getElementById("results");
-    const statusMsg = document.getElementById("statusMsg");
-
-    passageDisplay.innerText = passageText;
-
-    let startTime = null;
-    let running = false;
-
-    function resetTest() {
-      typingArea.value = "";
-      typingArea.disabled = true;
-      startTime = null;
-      running = false;
-      startBtn.disabled = false;
-      finishBtn.disabled = true;
-      resultsBox.innerHTML = "";
-      statusMsg.innerHTML =
-        "Click <strong>Start Test</strong> to begin.";
-    }
-
-    function startTest() {
-      resetTest();
-      typingArea.disabled = false;
-      typingArea.focus();
-      startTime = performance.now();
-      running = true;
-      startBtn.disabled = true;
-      finishBtn.disabled = false;
-      statusMsg.textContent = "Typing in progress... Do your best!";
-    }
-
-    function finishTest() {
-      if (!running || startTime === null) return;
-
-      const endTime = performance.now();
-      running = false;
-      typingArea.disabled = true;
-      finishBtn.disabled = true;
-      startBtn.disabled = false;
-
-      const totalMs = endTime - startTime;
-      const totalSeconds = totalMs / 1000;
-      const minutes = totalSeconds / 60;
-
-      const typed = typingArea.value;
-      const ref = passageText;
-
-      // Character-level accuracy
-      const maxLen = Math.max(typed.length, ref.length);
-      let correctChars = 0;
-      for (let i = 0; i < maxLen; i++) {
-        if (typed[i] === ref[i]) {
-          correctChars++;
-        }
-      }
-      const accuracy = maxLen === 0 ? 0 : (correctChars / maxLen) * 100;
-
-      // Simple characters-per-minute (CPM)
-      const cpm = minutes > 0 ? typed.length / minutes : 0;
-
-      let badgeClass = "needs";
-      let badgeText = "Keep Practicing";
-      if (accuracy >= 95) {
-        badgeClass = "good";
-        badgeText = "Amazing Accuracy!";
-      } else if (accuracy >= 85) {
-        badgeClass = "ok";
-        badgeText = "Nice Work!";
-      }
-
-      resultsBox.innerHTML = `
-        <div>
-          <strong>Time:</strong> ${totalSeconds.toFixed(1)} seconds
-        </div>
-        <div>
-          <strong>Accuracy:</strong> ${accuracy.toFixed(1)}%
-          <span class="badge ${badgeClass}">${badgeText}</span>
-        </div>
-        <div>
-          <strong>Characters Typed:</strong> ${typed.length}
-        </div>
-        <div>
-          <strong>Approx. Characters Per Minute:</strong> ${cpm.toFixed(0)}
-        </div>
-      `;
-
-      statusMsg.textContent = "Great job! You can start again if you want.";
-    }
-
-    startBtn.addEventListener("click", startTest);
-    finishBtn.addEventListener("click", finishTest);
-
-    // Reset on load
+  function startTest() {
     resetTest();
-  </script>
-</body>
-</html>
+    typingArea.disabled = false;
+    typingArea.focus();
+    startTime = performance.now();
+    running = true;
+    startBtn.disabled = true;
+    finishBtn.disabled = false;
+    statusMsg.textContent = "Typing in progress... Do your best!";
+  }
+
+  function finishTest() {
+    if (!running || startTime === null) return;
+
+    const endTime = performance.now();
+    running = false;
+    typingArea.disabled = true;
+    finishBtn.disabled = true;
+    startBtn.disabled = false;
+
+    const totalMs = endTime - startTime;
+    const totalSeconds = totalMs / 1000;
+    const minutes = totalSeconds / 60;
+
+    const typed = typingArea.value;
+    const ref = passageText;
+
+    // Character-level accuracy
+    const maxLen = Math.max(typed.length, ref.length);
+    let correctChars = 0;
+    for (let i = 0; i < maxLen; i++) {
+      if (typed[i] === ref[i]) {
+        correctChars++;
+      }
+    }
+    const accuracy = maxLen === 0 ? 0 : (correctChars / maxLen) * 100;
+
+    // Character count
+    const characterCount = typed.length;
+
+    // Word count (removes extra spaces)
+    const wordCount =
+      typed.trim().length === 0
+        ? 0
+        : typed.trim().split(/\s+/).length;
+
+    // Characters per minute
+    const cpm = minutes > 0 ? characterCount / minutes : 0;
+
+    let badgeClass = "needs";
+    let badgeText = "Keep Practicing";
+    if (accuracy >= 95) {
+      badgeClass = "good";
+      badgeText = "Amazing Accuracy!";
+    } else if (accuracy >= 85) {
+      badgeClass = "ok";
+      badgeText = "Nice Work!";
+    }
+
+    resultsBox.innerHTML = `
+      <div><strong>Time:</strong> ${totalSeconds.toFixed(1)} seconds</div>
+      <div><strong>Accuracy:</strong> ${accuracy.toFixed(1)}% 
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div><strong>Words Typed:</strong> ${wordCount}</div>
+      <div><strong>Characters Typed:</strong> ${characterCount}</div>
+      <div><strong>Characters Per Minute:</strong> ${cpm.toFixed(0)}</div>
+    `;
+
+    statusMsg.textContent = "Great job! You can start again if you want.";
+  }
+
+  startBtn.addEventListener("click", startTest);
+  finishBtn.addEventListener("click", finishTest);
+
+  resetTest();
+</script>
